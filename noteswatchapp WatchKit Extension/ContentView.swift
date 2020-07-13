@@ -8,35 +8,22 @@
 
 import SwiftUI
 
+var difficulty = Difficulty.beginner
+
 struct ContentView: View {
     var body: some View {
         VStack {
-            Text("🎸").font(.caption)
-            Button(
-                "Beginner",
-                action: {
-                    
-                }
-            )
-            Button(
-                "Intermediate",
-                action: {
-                    
-                }
-            )
-            Button(
-                "Expert",
-                action: {
-                    
-                }
-            )
+            NavigationLink(destination: GameView(difficulty: .beginner)) {
+                Text("🥴 Beginner")
+            }
+            NavigationLink(destination: GameView(difficulty: .intermediate)) {
+                Text("😬 Intermediate")
+            }
             
+            NavigationLink(destination: GameView(difficulty: .expert)) {
+                Text("🤟🏻 Expert")
+            }
         }
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+        .navigationBarTitle("🎸 chords")
     }
 }
