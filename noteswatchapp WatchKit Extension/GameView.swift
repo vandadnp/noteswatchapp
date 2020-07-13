@@ -74,7 +74,6 @@ class GameViewModel: ObservableObject {
         let currentNote = Note.randomNote()
         self.currentNote = currentNote
         
-        print(currentNote)
         var noteTypesForButtons =
             currentNote.noteType.noteTypesExcludingThis(
                 count: difficulty.buttonsRequired - 1
