@@ -56,16 +56,21 @@ struct GameView: View {
         self.difficulty = difficulty
     }
     
+    @State var showResults = false
+    @State private var shouldCancelTimer = false
+    
     var body: some View {
-        VStack {
-            Spacer()
-            
-            Text(answerText)
-                .font(.largeTitle)
-            
-            ForEach(rows) { row in
-                row
+        VStack(alignment: .center, spacing: 4.0) {
+            if !showResults {
+                ForEach(rows) { row in
+                    row
+                }
+            } else {
+                Text(answerText)
+                    .multilineTextAlignment(.center)
+                    .font(.title)
             }
+            
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSExtensionHostDidBecomeActive), perform: { _ in
             self.setupTimer()
@@ -77,8 +82,9 @@ struct GameView: View {
         .onAppear {
             self.setupTimer()
         }.onDisappear {
-            self.gameTimer?.stop()
+            self.shouldCancelTimer = true
             self.currentNote?.stop()
+            self.gameTimer?.stop()
         }
     }
     
@@ -87,26 +93,30 @@ struct GameView: View {
         guard let currentNote = currentNote else { return }
         if currentNote.noteType == noteType {
             //correct answer
-            answerText = "✅"
+            answerText = "✅\nThat's correct!"
         } else {
-            answerText = "❌"
+            answerText = "❌\nCorrect answer: \(currentNote.noteType.name)"
         }
+        showResults = true
         restartTimer()
     }
     
     @State var answerText = "🔊"
     
-    private func restartTimer(afterSeconds: Int = 1) {
+    private func restartTimer(afterSeconds: Int = 2) {
         DispatchQueue.main.asyncAfter(
             deadline: DispatchTime.now() + .seconds(afterSeconds),
             execute: {
-                self.answerText = "🔊"
-                self.setupTimer()
+                if !self.shouldCancelTimer {
+                    self.answerText = "🔊"
+                    self.setupTimer()
+                }
             }
         )
     }
     
     private func setupTimer() {
+        self.shouldCancelTimer = false
         self.gameTimer?.stop()
         self.gameTimer = GameTimer(onStarted: {
             self.setupButtonsAndPlayRandomNote()
@@ -140,6 +150,7 @@ struct GameView: View {
             )
             rows += [row]
         }
+        showResults = false
         self.rows = rows
         
         currentNote.play()
