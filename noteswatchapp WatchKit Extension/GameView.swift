@@ -45,19 +45,16 @@ struct AnswerButton: View {
 struct GameView: View {
     
     
-    let difficulty: Difficulty
-    
+    private let difficulty: Difficulty
     @State private var currentNote: Note?
     @State private var gameTimer: GameTimer?
-    
-    @State var rows = [AnswerRow]()
+    @State private var rows = [AnswerRow]()
+    @State private var showResults = false
+    @State private var shouldCancelTimer = false
     
     init(difficulty: Difficulty) {
         self.difficulty = difficulty
     }
-    
-    @State var showResults = false
-    @State private var shouldCancelTimer = false
     
     var body: some View {
         VStack(alignment: .center, spacing: 4.0) {
