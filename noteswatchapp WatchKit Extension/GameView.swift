@@ -48,6 +48,7 @@ struct GameView: View {
     let difficulty: Difficulty
     
     @State private var currentNote: Note?
+    @State private var gameTimer: GameTimer?
     
     @State var rows = [AnswerRow]()
     
@@ -57,16 +58,59 @@ struct GameView: View {
     
     var body: some View {
         VStack {
+            Spacer()
+            
+            Text(answerText)
+                .font(.largeTitle)
+            
             ForEach(rows) { row in
                 row
             }
-        }.onAppear {
-            self.setupButtonsAndPlayRandomNote()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .NSExtensionHostDidBecomeActive), perform: { _ in
+            self.setupTimer()
+        })
+        .onReceive(NotificationCenter.default.publisher(for: .NSExtensionHostDidEnterBackground), perform: { _ in
+            self.currentNote?.stop()
+            self.gameTimer?.stop()
+        })
+        .onAppear {
+            self.setupTimer()
+        }.onDisappear {
+            self.gameTimer?.stop()
+            self.currentNote?.stop()
         }
     }
     
     func processAnswer(noteType: Note.NoteType) {
-        
+        gameTimer?.stop()
+        guard let currentNote = currentNote else { return }
+        if currentNote.noteType == noteType {
+            //correct answer
+            answerText = "✅"
+        } else {
+            answerText = "❌"
+        }
+        restartTimer()
+    }
+    
+    @State var answerText = "🔊"
+    
+    private func restartTimer(afterSeconds: Int = 1) {
+        DispatchQueue.main.asyncAfter(
+            deadline: DispatchTime.now() + .seconds(afterSeconds),
+            execute: {
+                self.answerText = "🔊"
+                self.setupTimer()
+            }
+        )
+    }
+    
+    private func setupTimer() {
+        self.gameTimer?.stop()
+        self.gameTimer = GameTimer(onStarted: {
+            self.setupButtonsAndPlayRandomNote()
+        })
     }
     
     func setupButtonsAndPlayRandomNote() {
