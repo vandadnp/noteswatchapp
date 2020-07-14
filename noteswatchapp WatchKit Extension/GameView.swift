@@ -44,26 +44,26 @@ struct AnswerButton: View {
 
 struct GameView: View {
     
+    
     let difficulty: Difficulty
+    
+    @State private var currentNote: Note?
+    
+    @State var rows = [AnswerRow]()
     
     init(difficulty: Difficulty) {
         self.difficulty = difficulty
     }
     
     var body: some View {
-        let viewModel = GameViewModel(difficulty: difficulty)
-        return VStack {
-            ForEach(viewModel.rows) { row in
+        VStack {
+            ForEach(rows) { row in
                 row
             }
+        }.onAppear {
+            self.setupButtonsAndPlayRandomNote()
         }
     }
-}
-
-class GameViewModel: ObservableObject {
-    @Published var rows: [AnswerRow]!
-    private var currentNote: Note?
-    let difficulty: Difficulty
     
     func processAnswer(noteType: Note.NoteType) {
         
@@ -100,11 +100,6 @@ class GameViewModel: ObservableObject {
         
         currentNote.play()
         
-    }
-    
-    init(difficulty: Difficulty) {
-        self.difficulty = difficulty
-        setupButtonsAndPlayRandomNote()
     }
     
 }
