@@ -24,6 +24,5 @@ struct ContentView: View {
                 Text("🤟🏻 Expert")
             }
         }
-        .navigationBarTitle("🎸 chords")
     }
 }
