@@ -51,14 +51,26 @@ struct GameView: View {
     @State private var rows = [AnswerRow]()
     @State private var showResults = false
     @State private var shouldCancelTimer = false
+    @State private var correctAnswers = 0
+    @State private var incorrectAnswers = 0
     
     init(difficulty: Difficulty) {
         self.difficulty = difficulty
     }
     
     var body: some View {
-        VStack(alignment: .center, spacing: 4.0) {
+        VStack(alignment: .center, spacing: 1.0) {
             if !showResults {
+                Spacer()
+                    .frame(height: 5.0)
+                HStack {
+                    Text("❌: \(incorrectAnswers)")
+                        .font(.caption)
+                    Spacer()
+                    Text("✅: \(correctAnswers)")
+                        .font(.caption)
+                }
+                Spacer()
                 ForEach(rows) { row in
                     row
                 }
@@ -89,9 +101,11 @@ struct GameView: View {
         gameTimer?.stop()
         guard let currentNote = currentNote else { return }
         if currentNote.noteType == noteType {
+            correctAnswers += 1
             //correct answer
             answerText = "✅\nThat's correct!"
         } else {
+            incorrectAnswers += 1
             answerText = "❌\nCorrect answer: \(currentNote.noteType.name)"
         }
         showResults = true
